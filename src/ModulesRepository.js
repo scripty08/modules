@@ -31,13 +31,13 @@ export class ModulesRepository extends BaseRepository {
             code: MODULES_RESPONSE,
             response: {
                 modules: await Promise.all(response),
-                layout: layout,
+                layout: layout.layout,
             }
         });
     };
 
     async findLayout(assignment) {
-        const schema = { route: String, layout: Array };
+        const schema = { route: String, layout: Object };
         const model = this.getModel(schema, this.db, 'site_layouts');
         return await model.findOne({ assignment: assignment });
     }
@@ -56,14 +56,14 @@ export class ModulesRepository extends BaseRepository {
     }
 
     async updateLayout(query, presenter) {
-        const schema = { assignment: String, layout: Array }
+        const schema = { assignment: String, layout: Object }
         const model = this.getModel(schema, this.db, 'site_layouts');
         await model.findOneAndUpdate({ assignment: query.assignment }, { layout: query.layout }, { new: true });
         return await this.findModules(query, presenter);
     }
 
     async updateModule(query, presenter) {
-        let { _id, type, assignment, plugin, moduleId, title } = query;
+        let { _id, type, assignment, plugin, module_id, title } = query;
 
         if (!_id) {
             _id = new mongoose.mongo.ObjectID()
@@ -76,12 +76,9 @@ export class ModulesRepository extends BaseRepository {
                     $set: {
                         plugin,
                         type,
-                        module_id: moduleId,
+                        module_id: module_id,
                         title,
-                        assignment: {
-                            type: 'selected',
-                            value: [assignment]
-                        }
+                        assignment: assignment
                     }
                 },
                 { new: true, upsert: true }
