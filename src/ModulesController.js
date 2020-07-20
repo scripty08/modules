@@ -1,38 +1,62 @@
 import { ModulesRepository } from './ModulesRepository';
 import { ModulesPresenter } from './ModulesPresenter';
-import { ModulesSchema, ResponseModel } from './ModulesModel';
+import { PlacementsPresenter } from './PlacementsPresenter';
+import { ModulesSchema, PlacementsSchema } from './Schema';
+import { ModulesInteractor } from './ModulesInteractor';
+import { PlacementsInteractor } from './PlacementsInteractor';
+import { PlacementsRepository } from './PlacementsRepository';
 
 export class ModulesController {
 
     static collection = 'site_modules'
 
     init(server, router) {
-        this.repository = new ModulesRepository(ModulesSchema, server.db, ModulesController.collection);
+        this.modulesRepository = new ModulesRepository(ModulesSchema, server.db, ModulesController.collection);
+        this.placementsRepository = new PlacementsRepository(PlacementsSchema, server.db, ModulesController.collection);
+
+        router.get('/modules/findPlacements', this.findPlacementsAction.bind(this));
+        router.post('/modules/updatePlacements', this.updatePlacementsAction.bind(this));
+        router.get('/modules/destroyPlacements', this.destroyPlacementsAction.bind(this));
 
         router.get('/modules/findModules', this.findModulesAction.bind(this));
-        router.post('/modules/updateLayout', this.updateLayoutAction.bind(this));
-        router.post('/modules/updateModule', this.updateModuleAction.bind(this));
-        router.get('/modules/destroyModule', this.destroyModuleAction.bind(this));
+        router.post('/modules/updateModules', this.updateModulesAction.bind(this));
+        router.get('/modules/destroyModules', this.destroyModulesAction.bind(this));
         server.use(router);
     }
 
+    findPlacementsAction(req, res) {
+        const presenter = new PlacementsPresenter(res);
+        const interactor = new PlacementsInteractor(req.query, presenter, this.placementsRepository);
+        return interactor.run('findPlacements');
+    }
+
+    updatePlacementsAction(req, res) {
+        const presenter = new PlacementsPresenter(res);
+        const interactor = new PlacementsInteractor(req.body, presenter, this.placementsRepository);
+        return interactor.run('updatePlacements');
+    }
+
+    destroyPlacementsAction(req, res) {
+        const presenter = new ModulesPresenter(res);
+        const interactor = new PlacementsInteractor(req.body, presenter, this.placementsRepository);
+        return interactor.run('destroyPlacements');
+    }
+
     findModulesAction(req, res) {
-        const presenter = new ModulesPresenter(res, ResponseModel);
-        return this.repository.findModules(req.query, presenter)
+        const presenter = new ModulesPresenter(res);
+        const interactor = new ModulesInteractor(req.query, presenter, this.modulesRepository);
+        return interactor.run('findModules');
     }
 
-    updateLayoutAction(req, res) {
-        const presenter = new ModulesPresenter(res, ResponseModel);
-        return this.repository.updateLayout(req.body, presenter)
+    updateModulesAction(req, res) {
+        const presenter = new ModulesPresenter(res);
+        const interactor = new ModulesInteractor(req.body, presenter, this.modulesRepository);
+        return interactor.run('updateModules');
     }
 
-    updateModuleAction(req, res) {
-        const presenter = new ModulesPresenter(res, ResponseModel);
-        return this.repository.updateModule(req.body, presenter)
-    }
-
-    destroyModuleAction(req, res) {
-        const presenter = new ModulesPresenter(res, ResponseModel);
-        return this.repository.destroyModule(req.query, presenter)
+    destroyModulesAction(req, res) {
+        const presenter = new ModulesPresenter(res);
+        const interactor = new ModulesInteractor(req.body, presenter, this.modulesRepository);
+        return interactor.run('destroyModules');
     }
 }

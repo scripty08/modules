@@ -3,14 +3,10 @@ export const ModulesSchema = {
     assignment: Object,
     plugin: Object,
     module_id: String,
+    item_id: String,
     active: Boolean
 };
 
-export const ResponseModel = {
-    type: '',
-    assignment: {},
-    plugin: '',
-    module_id: '',
-    active: false,
-    _id: ''
+export const PlacementsSchema = {
+    placements: Array
 };

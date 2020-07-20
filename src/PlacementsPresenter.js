@@ -1,12 +1,12 @@
 import { Logger } from '@scripty/logger/src/Logger';
 import {
-    MODULES_DESTROYED_RESPONSE,
-    MODULES_ERROR_RESPONSE,
-    MODULES_RESPONSE,
-    MODULES_UPDATED_RESPONSE
+    PLACEMENTS_DESTROYED_RESPONSE,
+    PLACEMENTS_ERROR_RESPONSE,
+    PLACEMENTS_RESPONSE,
+    PLACEMENTS_UPDATED_RESPONSE
 } from './Constants';
 
-export class ModulesPresenter {
+export class PlacementsPresenter {
     constructor(response) {
         this.response = response;
     }
@@ -15,26 +15,24 @@ export class ModulesPresenter {
         const { code, response, message } = interactorResponse;
 
         switch (code) {
-            case MODULES_RESPONSE:
+            case PLACEMENTS_RESPONSE:
                 this.response.send({
-                    entries: response
+                    entries: [{ placements: response.placements }]
                 });
                 break;
-            case MODULES_UPDATED_RESPONSE:
+            case PLACEMENTS_UPDATED_RESPONSE:
                 this.response.send({
-                    entries: response
+                    entries: [{ placements: response.placements }]
                 });
                 break;
-            case MODULES_DESTROYED_RESPONSE:
+            case PLACEMENTS_DESTROYED_RESPONSE:
                 this.response.send({
-                    entries: response
+                    entries: [{ placements: response.placements }]
                 });
                 break;
-            case MODULES_ERROR_RESPONSE:
+            case PLACEMENTS_ERROR_RESPONSE:
                 Logger.error(message);
-                this.response.send({
-                    message: message
-                });
+                this.response.send({ message: message});
                 break;
         }
     };
